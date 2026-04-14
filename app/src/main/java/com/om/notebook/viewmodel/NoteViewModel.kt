@@ -5,18 +5,29 @@ import androidx.lifecycle.ViewModel
 import com.om.notebook.data.Note
 import com.om.notebook.data.NoteRepository
 
-class NoteViewModel: ViewModel() {
+class NoteViewModel : ViewModel() {
+
     private val repo = NoteRepository()
     val notesList = mutableStateOf<List<Note>>(emptyList())
 
-    fun fetchNotes(){
-        repo.getNotes{
+    fun fetchNotes() {
+        repo.getNotes {
             notesList.value = it
         }
     }
 
-    fun addNote(note: Note){
+    fun addNote(note: Note) {
         repo.addNote(note)
+        fetchNotes()
+    }
+
+    fun deleteNote(note: Note) {
+        repo.deleteNote(note)
+        fetchNotes()
+    }
+
+    fun updateNote(note: Note) {
+        repo.updateNote(note)
         fetchNotes()
     }
 }

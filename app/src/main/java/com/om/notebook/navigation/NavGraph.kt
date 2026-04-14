@@ -4,6 +4,7 @@ import androidx.compose.runtime.Composable
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.om.notebook.ui.AddNoteScreen
 import com.om.notebook.ui.ForgotPasswordScreen
 import com.om.notebook.ui.HomeScreen
 import com.om.notebook.ui.LoginScreen
@@ -36,8 +37,8 @@ fun NavGraph() {
             HomeScreen(navController)
         }
 
-        composable(Screen.Login.route) {
-            LoginScreen(navController)
+        composable(Screen.AddNote.route) {
+            AddNoteScreen(navController)
         }
 
 

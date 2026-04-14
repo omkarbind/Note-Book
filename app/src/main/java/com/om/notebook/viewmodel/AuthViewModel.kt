@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseUser
 
 class AuthViewModel: ViewModel() {
     private val auth = FirebaseAuth.getInstance()
@@ -27,5 +28,9 @@ class AuthViewModel: ViewModel() {
 
     fun resetPassword(email: String) {
         auth.sendPasswordResetEmail(email)
+    }
+
+    fun getCurrentUser(): FirebaseUser? {
+        return FirebaseAuth.getInstance().currentUser
     }
 }

@@ -58,14 +58,15 @@ fun LoginScreen(
         offsetY.animateTo(0f, animationSpec = tween(1000))
     }
 
-    LaunchedEffect(viewModel.isLoginSuccess.value) {
-        if (viewModel.isLoginSuccess.value) {
+    LaunchedEffect(Unit) {
+        val user = viewModel.getCurrentUser()
+
+        if (user != null) {
             navController.navigate("home") {
                 popUpTo("login") { inclusive = true }
             }
         }
     }
-
     Box(modifier = Modifier.fillMaxSize()) {
 
         // 🔥 Background Image
