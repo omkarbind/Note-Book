@@ -26,6 +26,7 @@ fun AddNoteScreen(
 
     Scaffold(
 
+        containerColor = MaterialTheme.colorScheme.onBackground,
         topBar = {
             TopAppBar(
                 title = { Text("New Note") },
