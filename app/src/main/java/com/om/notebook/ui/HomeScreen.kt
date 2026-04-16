@@ -6,6 +6,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -24,9 +25,6 @@ fun HomeScreen(
 
     val notes = viewModel.notesList.value
 
-
-    var title by remember { mutableStateOf("") }
-    var description by remember { mutableStateOf("") }
 
     LaunchedEffect(Unit) {
         viewModel.fetchNotes()
@@ -68,6 +66,17 @@ fun HomeScreen(
                             horizontalArrangement = Arrangement.End,
                             modifier = Modifier.fillMaxWidth()
                         ) {
+
+                            // ✏️ Edit
+                            IconButton(
+                                onClick = {
+                                    navController.navigate("editNote/${note.id}")
+                                }
+                            ) {
+                                Icon(Icons.Default.Edit, contentDescription = "Edit")
+                            }
+
+                            // 🗑 Delete
                             IconButton(
                                 onClick = { viewModel.deleteNote(note) }
                             ) {
@@ -78,7 +87,6 @@ fun HomeScreen(
                 }
             }
         }
-
         // 🔥 Floating Button
         FloatingActionButton(
             onClick = {

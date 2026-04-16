@@ -30,4 +30,7 @@ class NoteViewModel : ViewModel() {
         repo.updateNote(note)
         fetchNotes()
     }
+    fun getNoteById(id: String): Note? {
+        return notesList.value.find { it.id == id }
+    }
 }

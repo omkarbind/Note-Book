@@ -5,6 +5,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.om.notebook.ui.AddNoteScreen
+import com.om.notebook.ui.EditNoteScreen
 import com.om.notebook.ui.ForgotPasswordScreen
 import com.om.notebook.ui.HomeScreen
 import com.om.notebook.ui.LoginScreen
@@ -40,7 +41,17 @@ fun NavGraph() {
         composable(Screen.AddNote.route) {
             AddNoteScreen(navController)
         }
+        composable("editNote/{id}") { backStackEntry ->
 
+            val id = backStackEntry.arguments?.getString("id") ?: ""
+
+            EditNoteScreen(
+                navController = navController,
+                noteId = id,
+                oldTitle = "",
+                oldDescription = ""
+            )
+        }
 
     }
 }

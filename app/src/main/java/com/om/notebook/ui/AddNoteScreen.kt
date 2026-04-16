@@ -26,7 +26,7 @@ fun AddNoteScreen(
 
     Scaffold(
 
-        containerColor = MaterialTheme.colorScheme.onBackground,
+        containerColor = MaterialTheme.colorScheme.background,
         topBar = {
             TopAppBar(
                 title = { Text("New Note") },
@@ -94,6 +94,80 @@ fun AddNoteScreen(
                     focusedIndicatorColor = androidx.compose.ui.graphics.Color.Transparent,
                     unfocusedIndicatorColor = androidx.compose.ui.graphics.Color.Transparent
                 )
+            )
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun EditNoteScreen(
+    navController: NavController,
+    noteId: String,
+    oldTitle: String,
+    oldDescription: String,
+    viewModel: NoteViewModel = viewModel()
+) {
+
+    var title by remember { mutableStateOf(oldTitle) }
+    var noteText by remember { mutableStateOf(oldDescription) }
+    // 🔥 DATA LOAD HERE
+    LaunchedEffect(noteId) {
+        val note = viewModel.getNoteById(noteId)
+        if (note != null) {
+            title = note.title
+            noteText = note.description
+        }
+    }
+
+
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = { Text("Edit Note") },
+                actions = {
+                    IconButton(
+                        onClick = {
+                            if (noteText.isNotEmpty()) {
+                                viewModel.updateNote(
+                                    Note(
+                                        id = noteId.toString(),
+                                        title = title,
+                                        description = noteText
+                                    )
+                                )
+                                navController.popBackStack()
+                            }
+                        }
+                    ) {
+                        Icon(Icons.Default.Check, contentDescription = "Update")
+                    }
+                }
+            )
+        }
+    ) { padding ->
+
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(padding)
+                .padding(16.dp)
+        ) {
+
+            TextField(
+                value = title,
+                onValueChange = { title = it },
+                placeholder = { Text("Title") },
+                modifier = Modifier.fillMaxWidth()
+            )
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            TextField(
+                value = noteText,
+                onValueChange = { noteText = it },
+                placeholder = { Text("Edit note...") },
+                modifier = Modifier.fillMaxSize()
             )
         }
     }
