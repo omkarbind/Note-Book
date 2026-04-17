@@ -11,19 +11,21 @@ class NoteRepository {
             .add(note)
     }
 
-    fun getNotes(onResult: (List<Note>) -> Unit) {
+    fun getNoteById(id: String, onResult: (Note?) -> Unit) {
         db.collection("notes")
+            .document(id)
             .get()
-            .addOnSuccessListener { result ->
-                val notes = result.map {
-                    val note = it.toObject(Note::class.java)
-                    note.id = it.id   // 🔥 ID store karna important
-                    note
+            .addOnSuccessListener { document ->
+                if (document.exists()) {
+                    val note = document.toObject(Note::class.java)
+                    note?.id = document.id
+                    onResult(note)
+                } else {
+                    onResult(null)
                 }
-                onResult(notes)
             }
             .addOnFailureListener {
-                onResult(emptyList())
+                onResult(null)
             }
     }
 
@@ -33,9 +35,28 @@ class NoteRepository {
             .delete()
     }
 
-    fun updateNote(note: Note) {
+    fun update(note: Note) {
         db.collection("notes")
             .document(note.id)
             .set(note)
     }
+
+    fun getNotes(onResult: (List<Note>) -> Unit) {
+        db.collection("notes")
+            .get()
+            .addOnSuccessListener { result ->
+                val notes = mutableListOf<Note>()
+                for (document in result) {
+                    val note = document.toObject(Note::class.java)
+                    note.id = document.id
+                    notes.add(note)
+                }
+                onResult(notes)
+            }
+            .addOnFailureListener {
+                onResult(emptyList())
+            }
+
+    }
+
 }

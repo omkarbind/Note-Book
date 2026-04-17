@@ -47,9 +47,7 @@ fun NavGraph() {
 
             EditNoteScreen(
                 navController = navController,
-                noteId = id,
-                oldTitle = "",
-                oldDescription = ""
+                noteId = id
             )
         }
 
