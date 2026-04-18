@@ -96,19 +96,19 @@ fun AddNoteScreen(
                 .padding(16.dp)
         ) {
 
-            TextField(
-                value = title,
-                onValueChange = { title = it },
-                placeholder = { Text("Title") },
-                textStyle = MaterialTheme.typography.titleLarge,
-                modifier = Modifier.fillMaxWidth(),
-                colors = TextFieldDefaults.colors(
-                    focusedContainerColor = selectedColor,
-                    unfocusedContainerColor = selectedColor,
-                    focusedIndicatorColor = Color.Transparent,
-                    unfocusedIndicatorColor = Color.Transparent
-                )
-            )
+//            TextField(
+//                value = title,
+//                onValueChange = { title = it },
+//                placeholder = { Text("Title") },
+//                textStyle = MaterialTheme.typography.titleLarge,
+//                modifier = Modifier.fillMaxWidth(),
+//                colors = TextFieldDefaults.colors(
+//                    focusedContainerColor = selectedColor,
+//                    unfocusedContainerColor = selectedColor,
+//                    focusedIndicatorColor = Color.Transparent,
+//                    unfocusedIndicatorColor = Color.Transparent
+//                )
+//            )
 
             Spacer(modifier = Modifier.height(8.dp))
 
