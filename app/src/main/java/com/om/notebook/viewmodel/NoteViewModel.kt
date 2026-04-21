@@ -21,8 +21,9 @@ class NoteViewModel : ViewModel() {
     }
 
     fun addNote(note: Note) {
-        repository.addNote(note)
-        fetchNotes()
+        repository.addNote(note) {
+            fetchNotes() // 🔥 save hone ke baad hi call
+        }
     }
 
     fun deleteNote(note: Note) {

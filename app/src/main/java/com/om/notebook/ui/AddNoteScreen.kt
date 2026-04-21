@@ -13,11 +13,16 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.om.notebook.data.Note
+import com.om.notebook.data.TextStyleType
+import com.om.notebook.navigation.getTextStyle
 import com.om.notebook.viewmodel.NoteViewModel
+
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -33,6 +38,8 @@ fun AddNoteScreen(
     var selectedTextColor by remember { mutableStateOf(Color.Black) }
 
     var showColorPicker by remember { mutableStateOf(false) }
+    var selectedStyle by remember { mutableStateOf(TextStyleType.NORMAL) }
+    var showStyleDialog by remember { mutableStateOf(false) }
 
     val colors = listOf(
         Color.White, Color.Yellow, Color.Cyan,
@@ -65,6 +72,10 @@ fun AddNoteScreen(
                         Icon(Icons.Default.ColorLens, contentDescription = "Colors")
                     }
 
+
+                    IconButton(onClick = { showStyleDialog = true }) {
+                        Text("Aa")
+                    }
                     // 💾 SAVE
                     IconButton(
                         onClick = {
@@ -73,8 +84,9 @@ fun AddNoteScreen(
                                     Note(
                                         title = if (title.isEmpty()) noteText.take(20) else title,
                                         description = noteText,
-                                        color = selectedColor.value.toLong(),
-                                        textColor = selectedTextColor.value.toLong()
+                                        color = selectedColor.toArgb().toLong(),
+                                        textColor = selectedTextColor.toArgb().toLong(),
+                                        style = selectedStyle.name
                                     )
                                 )
                                 navController.popBackStack()
@@ -96,19 +108,19 @@ fun AddNoteScreen(
                 .padding(16.dp)
         ) {
 
-//            TextField(
-//                value = title,
-//                onValueChange = { title = it },
-//                placeholder = { Text("Title") },
-//                textStyle = MaterialTheme.typography.titleLarge,
-//                modifier = Modifier.fillMaxWidth(),
-//                colors = TextFieldDefaults.colors(
-//                    focusedContainerColor = selectedColor,
-//                    unfocusedContainerColor = selectedColor,
-//                    focusedIndicatorColor = Color.Transparent,
-//                    unfocusedIndicatorColor = Color.Transparent
-//                )
-//            )
+            TextField(
+                value = title,
+                onValueChange = { title = it },
+                placeholder = { Text("Title") },
+                textStyle = getTextStyle(selectedStyle),
+                modifier = Modifier.fillMaxWidth(),
+                colors = TextFieldDefaults.colors(
+                    focusedContainerColor = selectedColor,
+                    unfocusedContainerColor = selectedColor,
+                    focusedIndicatorColor = Color.Transparent,
+                    unfocusedIndicatorColor = Color.Transparent
+                )
+            )
 
             Spacer(modifier = Modifier.height(8.dp))
 
@@ -116,7 +128,9 @@ fun AddNoteScreen(
                 value = noteText,
                 onValueChange = { noteText = it },
                 placeholder = { Text("Start writing...") },
-                textStyle = LocalTextStyle.current.copy(color = selectedTextColor),
+                textStyle = getTextStyle(selectedStyle).copy(
+                    color = selectedTextColor
+                ),
                 modifier = Modifier.fillMaxSize(),
                 colors = TextFieldDefaults.colors(
                     focusedContainerColor = selectedColor,
@@ -191,4 +205,33 @@ fun AddNoteScreen(
             }
         )
     }
+
+
+    // 🔥 Style Picker
+    if (showStyleDialog) {
+        AlertDialog(
+            onDismissRequest = { showStyleDialog = false },
+            confirmButton = {},
+            title = { Text("Text Style") },
+            text = {
+                Column {
+                    TextStyleType.values().forEach { style ->
+                        Text(
+                            text = style.name,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clickable {
+                                    selectedStyle = style
+                                    showStyleDialog = false
+                                }
+                                .padding(8.dp)
+                        )
+                    }
+                }
+            }
+        )
+    }
+
+
 }
+

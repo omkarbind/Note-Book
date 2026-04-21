@@ -6,9 +6,12 @@ class NoteRepository {
 
     private val db = FirebaseFirestore.getInstance()
 
-    fun addNote(note: Note) {
+    fun addNote(note: Note, onSuccess: () -> Unit) {
         db.collection("notes")
             .add(note)
+            .addOnSuccessListener {
+                onSuccess() // 🔥 yaha signal milega
+            }
     }
 
     fun getNoteById(id: String, onResult: (Note?) -> Unit) {
