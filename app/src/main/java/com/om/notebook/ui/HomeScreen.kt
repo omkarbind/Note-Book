@@ -4,21 +4,28 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ExitToApp
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.ExitToApp
+import androidx.compose.material.icons.filled.Logout
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import com.google.firebase.auth.FirebaseAuth
 import com.om.notebook.data.TextStyleType
 import com.om.notebook.navigation.getTextStyle
+import com.om.notebook.utils.Prefs
 import com.om.notebook.viewmodel.NoteViewModel
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(
     navController: NavController,
@@ -26,104 +33,125 @@ fun HomeScreen(
 ) {
 
     val notes = viewModel.notesList.value
+    val context = LocalContext.current
 
-    // 🔥 Load data
     LaunchedEffect(Unit) {
         viewModel.fetchNotes()
     }
 
-    Box(modifier = Modifier.fillMaxSize()) {
+    Scaffold(
 
-        LazyColumn(
+        // 🔥 TOP BAR
+        topBar = {
+            TopAppBar(
+                title = { Text("Notes") },
+                actions = {
+                    IconButton(onClick = {
+                        FirebaseAuth.getInstance().signOut()
+                        Prefs.clear(context)
+
+                        navController.navigate("login") {
+                            popUpTo("home") { inclusive = true }
+                        }
+                    }) {
+                        Icon(Icons.Default.ExitToApp, contentDescription = "Logout")
+                    }
+                }
+            )
+        }
+
+    ) { padding ->
+
+        Box(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(top = 40.dp, start = 12.dp, end = 12.dp, bottom = 12.dp)
+                .padding(padding)
         ) {
 
-            items(notes) { note ->
+            LazyColumn(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(12.dp)
+            ) {
 
-                // 🔥 Safe style parsing
-                val style = try {
-                    TextStyleType.valueOf(note.style)
-                } catch (e: Exception) {
-                    TextStyleType.NORMAL
-                }
+                items(notes) { note ->
 
-                Card(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = 6.dp),
+                    val style = try {
+                        TextStyleType.valueOf(note.style)
+                    } catch (e: Exception) {
+                        TextStyleType.NORMAL
+                    }
 
-                    elevation = CardDefaults.cardElevation(6.dp),
+                    Card(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 6.dp),
 
-                    colors = CardDefaults.cardColors(
-                        containerColor = Color(note.color.toInt())
-                    )
-                ) {
+                        elevation = CardDefaults.cardElevation(6.dp),
 
-                    Column(modifier = Modifier.padding(16.dp)) {
-
-                        // 🔥 Title
-                        Text(
-                            text = note.title,
-                            style = MaterialTheme.typography.titleLarge.merge(
-                                getTextStyle(style)
-                            ),
-                            color = Color(note.textColor.toInt())
+                        colors = CardDefaults.cardColors(
+                            containerColor = Color(note.color.toInt())
                         )
+                    ) {
 
-                        Spacer(modifier = Modifier.height(4.dp))
+                        Column(modifier = Modifier.padding(16.dp)) {
 
-                        // 🔥 Description
-                        Text(
-                            text = note.description,
-                            style = MaterialTheme.typography.bodyMedium.merge(
-                                getTextStyle(style)
-                            ),
-                            color = Color(note.textColor.toInt())
-                        )
+                            Text(
+                                text = note.title,
+                                style = MaterialTheme.typography.titleLarge.merge(
+                                    getTextStyle(style)
+                                ),
+                                color = Color(note.textColor.toInt())
+                            )
 
-                        Spacer(modifier = Modifier.height(8.dp))
+                            Spacer(modifier = Modifier.height(4.dp))
 
-                        // 🔥 Actions
-                        Row(
-                            horizontalArrangement = Arrangement.End,
-                            modifier = Modifier.fillMaxWidth()
-                        ) {
+                            Text(
+                                text = note.description,
+                                style = MaterialTheme.typography.bodyMedium.merge(
+                                    getTextStyle(style)
+                                ),
+                                color = Color(note.textColor.toInt())
+                            )
 
-                            // ✏️ Edit
-                            IconButton(
-                                onClick = {
-                                    navController.navigate("editNote/${note.id}")
-                                }
+                            Spacer(modifier = Modifier.height(8.dp))
+
+                            Row(
+                                horizontalArrangement = Arrangement.End,
+                                modifier = Modifier.fillMaxWidth()
                             ) {
-                                Icon(Icons.Default.Edit, contentDescription = "Edit")
-                            }
 
-                            // 🗑 Delete
-                            IconButton(
-                                onClick = {
-                                    viewModel.deleteNote(note)
+                                IconButton(
+                                    onClick = {
+                                        navController.navigate("editNote/${note.id}")
+                                    }
+                                ) {
+                                    Icon(Icons.Default.Edit, contentDescription = "Edit")
                                 }
-                            ) {
-                                Icon(Icons.Default.Delete, contentDescription = "Delete")
+
+                                IconButton(
+                                    onClick = {
+                                        viewModel.deleteNote(note)
+                                    }
+                                ) {
+                                    Icon(Icons.Default.Delete, contentDescription = "Delete")
+                                }
                             }
                         }
                     }
                 }
             }
-        }
 
-        // 🔥 Floating Button
-        FloatingActionButton(
-            onClick = {
-                navController.navigate("addNote")
-            },
-            modifier = Modifier
-                .align(Alignment.BottomEnd)
-                .padding(bottom = 50.dp, end = 16.dp)
-        ) {
-            Icon(Icons.Default.Add, contentDescription = "Add Note")
+            FloatingActionButton(
+                onClick = {
+                    navController.navigate("addNote")
+                },
+                modifier = Modifier
+                    .align(Alignment.BottomEnd)
+                    .padding(16.dp)
+            ) {
+                Icon(Icons.Default.Add, contentDescription = "Add Note")
+            }
         }
     }
 }
